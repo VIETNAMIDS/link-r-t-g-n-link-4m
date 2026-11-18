@@ -1,6 +1,8 @@
-# RuaxBonz Desktop Link Bypass & Code Grabber
+# RuaxBonz Desktop — Công cụ tự động hóa trình duyệt
 
-Ứng dụng Desktop tự động hóa vượt link rút gọn (Link4M, Traffic120, v.v.), tự tìm kiếm Google, cuộn trang lấy mã xác nhận và gửi kết quả về Telegram Bot.
+RuaxBonz Desktop là ứng dụng tự động hóa trình duyệt trên máy tính, hỗ trợ xử lý liên kết, tìm kiếm web, đọc nội dung bằng AI và gửi thông báo qua Telegram. Ứng dụng được thiết kế để hỗ trợ các quy trình mà người dùng có quyền thực hiện; hãy tuân thủ điều khoản dịch vụ của website và luật áp dụng.
+
+Từ khóa: RuaxBonz, tự động hóa trình duyệt, ứng dụng desktop, xử lý liên kết, AI đọc nội dung, thông báo Telegram.
 
 ## 🚀 Hướng dẫn cài đặt & Khởi chạy
 
@@ -30,3 +32,6 @@ npm start
 
 ## 🔒 Bảo mật
 File `.env` đã được thêm vào `.gitignore` để tránh bị lộ Token / API Key khi đẩy mã nguồn lên GitHub.
+
+## Bản quyền và sử dụng hợp pháp
+© 2026 RuaxBonz.com. Người dùng có trách nhiệm bảo đảm việc sử dụng ứng dụng tuân thủ pháp luật, quyền của bên thứ ba và điều khoản dịch vụ áp dụng. Nhà phát triển không khuyến khích hành vi vi phạm; thông báo này không loại trừ trách nhiệm trong phạm vi pháp luật quy định.
