@@ -4,6 +4,8 @@ RuaxBonz Desktop là ứng dụng tự động hóa trình duyệt trên máy t�
 
 Từ khóa: RuaxBonz, tự động hóa trình duyệt, ứng dụng desktop, xử lý liên kết, AI đọc nội dung, thông báo Telegram.
 
+#RuaxBonz #TuDongHoaTrinhDuyet #UngDungDesktop #XuLyLienKet #AI #Telegram
+
 ## 🚀 Hướng dẫn cài đặt & Khởi chạy
 
 ### 1. Cài đặt các thư viện phụ thuộc:
