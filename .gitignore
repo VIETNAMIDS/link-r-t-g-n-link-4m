@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Environment Variables (Secrets & API Keys)
+.env
+.env.local
+*.env
+
+# Local screenshots & cache
+screenshots/
+adblocker-engine.bin
+
+# OS & Logs
+*.log
+.DS_Store
+Thumbs.db

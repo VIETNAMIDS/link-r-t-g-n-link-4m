@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><style>html,body{margin:0;height:100%}webview{width:100%;height:100%;border:0}</style></head>
+<body>
+  <webview id="wv" partition="persist:real_chrome_profile"
+    useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+    preload="guest-preload.js"
+    allowpopups="true"
+    webpreferences="contextIsolation=false, nodeIntegration=false, nativeWindowOpen=true"
+    src="https://link4m.net/go/PMJ3J"></webview>
+  <script>
+    const wv = document.getElementById('wv');
+    wv.addEventListener('dom-ready', () => {
+      console.log('TESTCAPTURE_DOM_READY url=' + wv.getURL() + ' title=' + wv.getTitle());
+    });
+    wv.addEventListener('did-fail-load', (e) => {
+      console.log('TESTCAPTURE_FAIL_LOAD code=' + e.errorCode + ' desc=' + e.errorDescription);
+    });
+    wv.addEventListener('console-message', (e) => {
+      if (typeof e.message === 'string' && e.message.startsWith('__AUTO_GET_CODE__:')) {
+        console.log('TESTCAPTURE_GUEST ' + e.message);
+      }
+    });
+  </script>
+</body>
+</html>

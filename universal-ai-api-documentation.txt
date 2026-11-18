@@ -1,0 +1,309 @@
+# Tài Liệu Kỹ Thuật Universal AI API & Danh Bạ 131 Model AI (RuaxBonz Gateway)
+
+Tài liệu này cung cấp toàn bộ hướng dẫn kết nối, cơ chế xác thực an toàn, quy chuẩn yêu cầu (Request/Response) tương thích chuẩn OpenAI, và danh bạ phân loại chi tiết hơn 130 mô hình trí tuệ nhân tạo (AI) có thể gọi từ bất kỳ nền tảng nào (Terminal cURL, Web frontend, Node.js, Python, Cursor, Cline, Aider).
+
+---
+
+## 1. Thông Tin Kết Nối & Xác Thực (Authentication)
+
+### 1.1. Các Endpoint Cốt Lõi
+| Mục đích | Giao thức & Đường dẫn | Định dạng |
+| :--- | :--- | :--- |
+| **Chat Completions (Chuẩn OpenAI)** | `POST https://ruaxbonz.com/v1/chat/completions`<br>`POST https://ruaxbonz.com/api/v1/chat/completions` | JSON / SSE Stream |
+| **Universal Chat API** | `POST https://ruaxbonz.com/api/ai/chat` | JSON |
+| **Lấy danh bạ Models** | `GET https://ruaxbonz.com/v1/models`<br>`GET https://ruaxbonz.com/api/ai/models` | JSON |
+| **Giao diện Playground kiểm thử** | `GET https://ruaxbonz.com/test-ai` | Web UI |
+
+### 1.2. Cơ Chế Xác Thực Mật Khẩu (`Thangloi8030@`)
+Mọi yêu cầu đến API đều bắt buộc phải cung cấp mật khẩu `Thangloi8030@`. Nếu không có hoặc nhập sai, API sẽ từ chối ngay với mã lỗi `401 Unauthorized`.
+
+Bạn có thể truyền mật khẩu theo 1 trong 4 cách sau tùy vào thư viện hoặc công cụ sử dụng:
+1. **HTTP Bearer Token (Khuyên dùng cho OpenAI SDK/Curl):**
+   ```http
+   Authorization: Bearer Thangloi8030@
+   ```
+2. **HTTP Custom Header:**
+   ```http
+   X-API-KEY: Thangloi8030@
+   hoặc
+   X-Passcode: Thangloi8030@
+   ```
+3. **Trong thân dữ liệu JSON (Request Body):**
+   ```json
+   {
+     "password": "Thangloi8030@",
+     "model": "deepseek-r1",
+     "messages": [{"role": "user", "content": "Hello"}]
+   }
+   ```
+4. **Tham số trên URL (Query String):**
+   ```text
+   https://ruaxbonz.com/api/ai/chat?key=Thangloi8030@
+   ```
+
+---
+
+## 2. Quy Chuẩn Gửi Dữ Liệu (Request & Response)
+
+### 2.1. Yêu cầu văn bản thuần túy (Text-Only Prompt)
+```json
+{
+  "model": "deepseek-r1",
+  "temperature": 0.7,
+  "max_tokens": 2048,
+  "messages": [
+    {
+      "role": "system",
+      "content": "Bạn là chuyên gia cố vấn công nghệ."
+    },
+    {
+      "role": "user",
+      "content": "Giải thích thuật toán Dijkstra bằng ví dụ thực tế."
+    }
+  ]
+}
+```
+
+### 2.2. Yêu cầu có hình ảnh (Multimodal Vision Prompt)
+> [!IMPORTANT]
+> Chỉ các mô hình hỗ trợ Vision (như `gemini-2.0-flash`, `gpt-4o`, `pixtral-12b`, `qwen/qwen3-vl-plus:free`) mới xử lý được ảnh. Các model như `deepseek-r1` hoặc `llama-3.3-70b` sẽ báo lỗi nếu nhận mảng `image_url`.
+
+```json
+{
+  "model": "gemini-2.0-flash",
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "Hãy giải bài toán trong ảnh này và chọn đáp án trắc nghiệm đúng:"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA..."
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 2.3. Cấu trúc phản hồi chuẩn OpenAI (Response Format)
+```json
+{
+  "id": "chatcmpl-22da06d8b796db140c445306",
+  "object": "chat.completion",
+  "created": 1794728246,
+  "model": "gemini-2.0-flash",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Đáp án chính xác là C."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 45,
+    "completion_tokens": 12,
+    "total_tokens": 57
+  }
+}
+```
+
+---
+
+## 3. Phân Loại Năng Lực & Khuyến Nghị Lựa Chọn Model
+
+```mermaid
+graph TD
+    A["Nhu cầu bài toán"] --> B{"Có cần đọc ảnh không?"}
+    B -- "CÓ (Vision/Ảnh/Đồ thị)" --> C["Nhóm Vision Multimodal"]
+    B -- "KHÔNG (Văn bản thuần)" --> D{"Mục tiêu chính?"}
+    
+    C --> C1["gemini-2.0-flash (Cực nhanh, đa năng)"]
+    C --> C2["gpt-4o (Suy luận ảnh logic cao)"]
+    C --> C3["pixtral-12b (Chuyên OCR tài liệu)"]
+    
+    D -- "Toán / Suy luận logic sâu" --> E["DeepSeek R1 / o1 / o3"]
+    D -- "Viết Code / Debug phần mềm" --> F["Qwen 2.5 Coder / Codestral"]
+    D -- "Tốc độ siêu nhanh / Chatbot" --> G["LLaMA 3.3 70B (Groq)"]
+```
+
+### Bảng tóm tắt các mô hình tiêu biểu theo nghiệp vụ:
+| Nhóm nghiệp vụ | Model ID khuyến nghị | Hỗ trợ ảnh (Vision) | Đặc điểm nổi bật |
+| :--- | :--- | :---: | :--- |
+| **Đọc ảnh & Giải bài tập** | `gemini-2.0-flash` | **Có** | Nhận diện chữ viết tay, đồ thị, sơ đồ với độ trễ thấp |
+| **Thị giác máy tính cao cấp** | `gpt-4o` | **Có** | Xử lý ảnh phức tạp, bảng biểu nhiều cột, phân tích bố cục |
+| **OCR tài liệu chuyên dụng** | `pixtral-12b` | **Có** | Dòng chuyên biệt của Mistral cho thị giác máy tính |
+| **Toán học & Suy luận chuỗi tư duy** | `deepseek-r1` | Không | Mô hình suy luận đỉnh cao, tự sinh chuỗi suy nghĩ tư duy |
+| **Lập trình & Kỹ thuật phần mềm** | `qwen-2.5-coder` | Không | Chuyên cú pháp, kiến trúc hàm, thuật toán và fix bug |
+| **Lập trình backend & API** | `codestral-latest` | Không | Ngữ cảnh 256K tokens, tối ưu cho dự án code lớn |
+| **Phản hồi siêu tốc (Real-time)** | `llama-3.3-70b` | Không | Xử lý trên chip LPU (Groq), đạt trên 250 từ/giây |
+
+---
+
+## 4. Danh Bạ Chi Tiết 131 Model Được Cung Cấp
+
+Dưới đây là danh sách đầy đủ 131 mô hình đã được đồng bộ và sẵn sàng phục vụ qua API Gateway:
+
+### 4.1. Nhóm Google & OpenAI Flagship
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Tính năng chính |
+| :--- | :--- | :--- | :--- |
+| `gemini-2.0-flash` | Gemini 2.0 Flash (Siêu Tốc) | 1,000,000 tokens | **Multimodal Vision**, siêu tốc độ |
+| `gemini-1.5-flash` | Gemini 1.5 Flash (Google) | 1,000,000 tokens | **Multimodal Vision**, tài liệu lớn |
+| `gpt-4o` | ChatGPT 4o (OpenAI) | 128,000 tokens | **Multimodal Vision**, Flagship |
+| `gh/gpt-4o` | OpenAI GPT-4o Flagship | 128,000 tokens | **Multimodal Vision**, ổn định cao |
+| `gh/gpt-4o-mini` | OpenAI GPT-4o Mini | 128,000 tokens | Vision nhẹ, phản hồi nhanh |
+| `gh/gpt-4.1` | OpenAI GPT-4.1 Preview | 128,000 tokens | Mô hình lập trình và phân tích mới |
+| `gh/gpt-5.4-nano` | OpenAI GPT-5.4 Nano | 128,000 tokens | Thế hệ kiến trúc thu nhỏ |
+| `nttcodex/gpt-6-astra` | GPT-6 Astra (Codex Flagship) | 131,072 tokens | Suy luận phức tạp |
+| `nttcodex/gpt-6.1-sol` | GPT-6.1 Sol (Codex) | 131,072 tokens | Lý luận đa tầng |
+| `nttcodex/gemini-3.8-flash` | Gemini 3.8 Flash (Google Codex) | 1,048,576 tokens | Ngữ cảnh 1 triệu tokens |
+| `ag/gemini-3.8-flash` | Google Gemini 3.8 Flash | 1,000,000 tokens | Đàm thoại nhanh |
+
+### 4.2. Nhóm DeepSeek & Suy Luận Tư Duy (Reasoning)
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Tính năng chính |
+| :--- | :--- | :--- | :--- |
+| `deepseek-r1` | DeepSeek R1 (Thinking Mode) | 65,536 tokens | Chuỗi suy nghĩ, toán học cao cấp |
+| `deepseek-v3` | DeepSeek V3 Standard | 65,536 tokens | Đa năng, đối thoại tự nhiên |
+| `deepseek-r1-distill-llama-70b` | DeepSeek R1 (Llama 70B Distill) | 65,536 tokens | Tối ưu suy luận trên nhân LLaMA |
+| `kr/deepseek-3.2-thinking` | DeepSeek 3.2 Thinking | 65,536 tokens | Tự phản biện và kiểm tra lỗi |
+| `kr/deepseek-3.2-agentic` | DeepSeek 3.2 Agentic | 65,536 tokens | Chạy tác vụ tự động (Agent) |
+
+### 4.3. Nhóm Anthropic Claude
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Tính năng chính |
+| :--- | :--- | :--- | :--- |
+| `claude-3-5-sonnet` | Claude 3.5 Sonnet Standard | 200,000 tokens | **Multimodal Vision**, viết lách xuất sắc |
+| `kr/claude-sonnet-4.5` | Anthropic Claude Sonnet 4.5 | 200,000 tokens | Phân tích logic và văn phong tinh tế |
+| `kr/claude-sonnet-4.5-thinking`| Claude Sonnet 4.5 Thinking | 200,000 tokens | Suy luận học thuật chuyên sâu |
+| `kr/claude-haiku-4.5` | Claude Haiku 4.5 Standard | 200,000 tokens | Tốc độ nhanh, tiết kiệm tài nguyên |
+
+### 4.4. Nhóm Chuyên Viết Code (Coding & Software Engineering)
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Ngôn ngữ hỗ trợ mạnh |
+| :--- | :--- | :--- | :--- |
+| `qwen-2.5-coder-32b` | Qwen 2.5 Coder 32B | 32,768 tokens | Python, JS/TS, C++, Java, PHP, Go |
+| `qwen/qwen3-coder-plus:free` | Qwen 3 Coder Plus (Free) | 1,048,576 tokens | Full stack, refactor nguyên project |
+| `kr/qwen3-coder-next-thinking` | Qwen 3 Coder Next Thinking | 128,000 tokens | Tự phân tích bug trước khi xuất code |
+| `codestral-latest` | Codestral 22B | 256,000 tokens | Code completion và giải thích thuật toán |
+| `mistralai/codestral-2508` | Codestral 2508 (Mistral Code) | 256,000 tokens | Ngữ cảnh cực rộng, kiến trúc hệ thống |
+| `mistralai/devstral-medium` | Devstral 2 (Software Dev) | 256,000 tokens | DevOps, scripts và cấu hình hạ tầng |
+| `poolside/laguna-s-2.1:free` | Poolside Laguna S 2.1 Coder | 131,072 tokens | Tối ưu hóa code và kiểm thử |
+
+### 4.5. Nhóm Groq Siêu Tốc & LLaMA 3.3
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Tốc độ sinh token |
+| :--- | :--- | :--- | :--- |
+| `llama-3.3-70b-versatile` | Llama 3.3 70B (Groq LPU) | 128,000 tokens | ~250 - 300 tokens/s |
+| `mixtral-8x7b-32768` | Mixtral 8x7B (Groq) | 32,768 tokens | ~350 - 400 tokens/s |
+| `gemma2-9b-it` | Gemma 2 9B (Groq) | 8,192 tokens | Siêu nhẹ, phản hồi tức thì |
+| `openai/gpt-oss-120b` | OpenAI GPT-OSS 120B | 131,072 tokens | Mô hình mở cao cấp |
+| `openai/gpt-oss-20b` | OpenAI GPT-OSS 20B | 131,072 tokens | Chuyên microservice |
+
+### 4.6. Nhóm Qwen Đa Phương Thức & Flagship (Alibaba Cloud)
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Năng lực |
+| :--- | :--- | :--- | :--- |
+| `qwen/qwen3-vl-plus:free` | Qwen 3 VL Plus | 262,144 tokens | **Thị giác (Vision)**, đọc biểu đồ, OCR |
+| `qwen/qwen3.8-max:free` | Qwen 3.8 Max | 1,000,000 tokens | Flagship toàn năng |
+| `qwen/qwen3.7-max:free` | Qwen 3.7 Max | 1,000,000 tokens | Suy luận toán học |
+| `qwen/qwen3.8-omni-flash:free`| Qwen 3.8 Omni Flash | 1,000,000 tokens | Xử lý đa phương thức |
+| `qwen/qwen3.5-plus:free` | Qwen 3.5 Plus | 1,000,000 tokens | Ngữ cảnh 1 triệu tokens |
+
+### 4.7. Nhóm xAI Grok & MiniMax & Zhipu GLM
+| Model ID | Tên hiển thị | Ngữ cảnh tối đa | Điểm mạnh |
+| :--- | :--- | :--- | :--- |
+| `gcli/grok-4.7` | xAI Grok 4.7 (Elon Musk) | 131,072 tokens | Trực quan, sắc bén, không thiên vị |
+| `kr/minimax-m2.5-thinking` | MiniMax M2.5 Thinking | 1,000,000 tokens | Tiếng Việt và văn phong Châu Á |
+| `kr/glm-5-thinking` | Zhipu GLM-5 Thinking | 128,000 tokens | Toán học và cấu trúc dữ liệu |
+| `nvidia/nemotron-3.5-super-vl:free`| Nvidia Nemotron 3.5 Super VL | 131,072 tokens | **Vision đồ họa cao cấp** |
+| `cohere/command-r-plus-08-2024`| Cohere Command R+ | 128,000 tokens | Trích xuất thông tin doanh nghiệp (RAG) |
+
+---
+
+## 5. Hướng Dẫn Tích Hợp Đa Nền Tảng (Code Mẫu)
+
+### 5.1. cURL (Terminal / Bash / CMD)
+```bash
+curl -X POST https://ruaxbonz.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer Thangloi8030@" \
+  -d '{
+    "model": "deepseek-r1",
+    "messages": [
+      {"role": "user", "content": "Viết thuật toán sắp xếp nhanh (QuickSort) bằng Python"}
+    ],
+    "temperature": 0.3
+  }'
+```
+
+### 5.2. JavaScript / Node.js (Fetch API)
+```javascript
+async function askAI(prompt, model = 'deepseek-v3') {
+  const res = await fetch('https://ruaxbonz.com/api/ai/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer Thangloi8030@'
+    },
+    body: JSON.stringify({
+      model: model,
+      messages: [
+        { role: 'system', content: 'Bạn là chuyên viên kỹ thuật giải đáp ngắn gọn.' },
+        { role: 'user', content: prompt }
+      ]
+    })
+  });
+
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+
+askAI('So sánh ưu nhược điểm giữa Redis và Memcached').then(console.log);
+```
+
+### 5.3. Python (Thư Viện Chuẩn `openai`)
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://ruaxbonz.com/v1",
+    api_key="YOUR_API_KEY"
+)
+
+# 1. Gọi mô hình suy luận sâu
+response = client.chat.completions.create(
+    model="deepseek-r1",
+    messages=[
+        {"role": "user", "content": "Một người bán 100 quả táo với lãi 20%, tính giá vốn."}
+    ]
+)
+print("DeepSeek R1:", response.choices[0].message.content)
+
+# 2. Gọi mô hình thị giác (Vision)
+vision_response = client.chat.completions.create(
+    model="gemini-2.0-flash",
+    messages=[
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": "Mô tả hình ảnh sau:"},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": "https://example.com/sample.png"}
+                }
+            ]
+        }
+    ]
+)
+print("Gemini Vision:", vision_response.choices[0].message.content)
+```
+
+### 5.4. Tích Hợp Vào Cursor IDE / Cline / Aider / OpenCode
+Trong phần cài đặt `OpenAI Compatible Provider` của các công cụ lập trình, điền như sau:
+* **Base URL:** `https://ruaxbonz.com/v1`
+* **API Key:** `Thangloi8030@`
+* **Model Name:** Điền bất kỳ model nào như `deepseek-r1`, `qwen-2.5-coder`, `gpt-4o`, `gemini-2.0-flash`

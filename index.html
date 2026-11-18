@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RUAXBONZ.COM - VƯỢT LINK TỰ ĐỘNG LẤY MÃ</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Phân vùng trình duyệt lớn bên trái (Multi-Tab Browser) -->
+    <main class="browser-viewport">
+      <nav class="tabs-bar">
+        <div class="tabs-list" id="tabs-container"></div>
+        <button id="btn-add-tab" class="tab-add-btn" title="Mở tab mới"><i class="fa-solid fa-plus"></i></button>
+      </nav>
+
+      <header class="browser-header">
+        <div class="nav-controls">
+          <button id="btn-back" title="Quay lại"><i class="fa-solid fa-arrow-left"></i></button>
+          <button id="btn-forward" title="Tiếp theo"><i class="fa-solid fa-arrow-right"></i></button>
+          <button id="btn-refresh" title="Tải lại"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+        <div class="address-bar-wrapper">
+          <i class="fa-solid fa-lock security-icon"></i>
+          <input type="text" id="browser-url-display" placeholder="Nhập địa chỉ web hoặc tìm kiếm Google..." value="about:blank">
+        </div>
+        <div class="window-actions"><span class="badge" id="browser-status-badge">Sẵn sàng</span></div>
+      </header>
+
+      <div class="browser-body">
+        <div class="webviews-wrapper" id="webviews-container">
+          <div class="empty-state" id="empty-state-view">
+            <i class="fa-solid fa-link empty-icon"></i>
+            <h3>Hệ Thống Tự Động Vượt Link & Lấy Mã</h3>
+            <p>Dán link rút gọn hoặc từ khóa Google vào thanh địa chỉ để bắt đầu.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="browser-footer">
+        <div class="footer-status"><span class="status-dot"></span><span>Đang mở: <strong id="total-tabs-text">0 tab</strong></span></div>
+        <div class="footer-stats"><span>Thời gian: <span id="timer-text">00:00</span></span></div>
+      </footer>
+    </main>
+
+    <!-- Thanh bên phải: CHUYÊN BIỆT VƯỢT LINK (RUAXBONZ AUTO) -->
+    <aside class="extension-sidebar">
+      <div class="sidebar-header">
+        <div class="header-left">
+          <div class="brand">
+            <i class="fa-solid fa-link brand-icon"></i>
+            <div class="brand-titles">
+              <h2>RUAXBONZ.COM</h2>
+              <div class="sub">TỰ ĐỘNG LẤY MÃ</div>
+            </div>
+          </div>
+        </div>
+        <div class="header-tags">
+          <span class="dot-online"></span><span class="badge">v1.5</span>
+        </div>
+      </div>
+
+      <div class="sidebar-content">
+        <!-- VƯỢT LINK PANEL DUY NHẤT -->
+        <div class="panel active" id="panel-vuotlink">
+          <section class="status-dashboard">
+            <div class="status-row">
+              <span class="status-title">Trạng thái:</span>
+              <span class="status-val text-cyan" id="auto-status-text">Đang quét nút...</span>
+            </div>
+            <div class="status-row">
+              <span class="status-title">Bộ đếm thời gian:</span>
+              <span class="status-val text-warning" id="auto-timer-text">Chờ lấy mã</span>
+            </div>
+          </section>
+
+          <section class="link-input-card">
+            <p class="link-input-hint">Chọn một trong hai cách:</p>
+            <label for="shortlink-url-input">LINK RÚT GỌN CẦN VƯỢT (Link4M hoặc link khác)</label>
+            <input id="shortlink-url-input" type="text" placeholder="Dán link rút gọn vào đây">
+            <label for="target-website-url-input">HOẶC LINK WEBSITE (tìm Google, bấm kết quả đầu tiên)</label>
+            <input id="target-website-url-input" type="text" placeholder="Dán link website cần tìm">
+            <button id="btn-start-link-flow" class="btn btn-primary btn-start-link-flow">Bắt đầu vượt link</button>
+          </section>
+
+          <div class="delay-bar">
+            <span class="delay-title"><i class="fa-regular fa-clock"></i> Delay vào web:</span>
+            <div class="counter-box">
+              <button id="btn-delay-minus">-</button>
+              <span id="delay-num-text">3</span> giây
+              <button id="btn-delay-plus">+</button>
+            </div>
+          </div>
+          <div class="system-active-indicator"><i class="fa-solid fa-bolt"></i> Đã kích hoạt hệ thống!</div>
+
+          <section class="ai-card">
+            <div class="ai-header">
+              <div class="ai-title"><i class="fa-solid fa-robot"></i> AI Vượt Link (Gemini Vision)</div>
+              <span class="badge-auto">TỰ ĐỘNG</span>
+            </div>
+            <p class="ai-desc">Tự chụp web, lưu thư mục & tự upload online lấy link công khai</p>
+            <div style="display: flex; gap: 6px; margin: 8px 0;">
+              <button id="btn-ai-scan-now" class="btn-ai-pulse" style="flex: 1;"><i class="fa-solid fa-camera"></i> ⚡ Chụp & Đọc AI</button>
+              <button id="btn-upload-online" class="pill-toggle" style="background: #065f46; color: #34d399; border: 1px solid #059669; padding: 6px 10px;" title="Upload ảnh lấy link"><i class="fa-solid fa-cloud-arrow-up"></i> Up Link</button>
+              <button id="btn-open-screenshots" class="pill-toggle" style="background: #1e293b; color: #38bdf8; border: 1px solid #0284c7; padding: 6px 8px;" title="Mở thư mục ảnh"><i class="fa-solid fa-folder-open"></i></button>
+            </div>
+            <span class="ai-sub">Ảnh tự lưu vào thư mục và upload online (Copy link).</span>
+          </section>
+
+          <div class="toggles-row">
+            <button id="toggle-bypass" class="pill-toggle active"><i class="fa-solid fa-bolt"></i> Bypass: <span class="val">BẬT</span></button>
+            <button id="toggle-scroll" class="pill-toggle active"><i class="fa-solid fa-bolt"></i> Scroll: <span class="val">BẬT</span></button>
+          </div>
+          <button id="btn-step2" class="btn-step2"><i class="fa-solid fa-forward-step"></i> ⏩ Bước 2 (Tiếp tục)</button>
+
+          <section class="result-card">
+            <div class="result-label">MÃ XÁC NHẬN (TỰ ĐỘNG COPY):</div>
+            <div class="code-box-wrapper">
+              <div id="code-result-val" class="code-value-text">Chờ lấy mã...</div>
+              <button id="btn-copy-code" class="btn-copy-icon" title="Sao chép"><i class="fa-regular fa-copy"></i></button>
+            </div>
+            <div id="copy-notify" class="copy-hint text-success"><i class="fa-solid fa-check"></i> Đã tự động lưu vào bộ nhớ đệm (Clipboard)!</div>
+          </section>
+
+          <section class="card logs-card" style="margin-top: 10px;">
+            <div class="logs-header">
+              <h4 class="card-title"><i class="fa-solid fa-terminal"></i> Nhật ký hoạt động</h4>
+              <button id="btn-clear-logs" class="btn-text">Xóa</button>
+            </div>
+            <div class="log-stream" id="log-container">
+              <div class="log-entry info">[Khởi động] Hệ thống tự động vượt link sẵn sàng.</div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span>Trạng thái: <span id="app-state-label" class="state-running">Hoạt động</span></span>
+        <button id="btn-sound-toggle" class="btn-text" title="Âm thanh"><i class="fa-solid fa-volume-high"></i></button>
+      </div>
+    </aside>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
